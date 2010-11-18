@@ -281,6 +281,11 @@ def service(service_id, path=None,
         if wsgi_wrapper:
             wrapper = wsgi_wrapper(wrapper)
 
+        #For purposes of inspection (not a good idea to change these otherwise you'll lose sync with the values closed over)
+        wrapper.content_type = content_type
+        wrapper.encoding = encoding
+        wrapper.writer = writer
+
         registry.register_service(service_id, pth, wrapper, query_template=query_template)
         return wrapper
     return service_wrapper
@@ -432,7 +437,12 @@ def simple_service(method, service_id, path=None,
         if wsgi_wrapper:
            wrapper = wsgi_wrapper(wrapper)
 
-        registry.register_service(service_id, pth, wrapper, query_template=qt) 
+        #For purposes of inspection (not a good idea to change these otherwise you'll lose sync with the values closed over)
+        wrapper.content_type = content_type
+        wrapper.encoding = encoding
+        wrapper.writer = writer
+
+        registry.register_service(service_id, pth, wrapper, query_template=qt)
         return wrapper
     return service_wrapper
 
@@ -595,6 +605,11 @@ class service_dispatcher_decorator(object):
                 result, ctype, clength = convert_body(result, None, encoding, writer)
                 return result
 
+            #For purposes of inspection (not a good idea to change these otherwise you'll lose sync with the values closed over)
+            method_wrapper.content_type = None
+            method_wrapper.encoding = encoding
+            method_wrapper.writer = writer
+
             self.dispatcher.add_handler(method, method_wrapper)
             return method_wrapper
         return service_dispatch_decorator_method_wrapper
@@ -620,6 +635,11 @@ class service_dispatcher_decorator(object):
                 result, ctype, clength = convert_body(result, content_type, encoding, writer)
                 send_headers(start_response, ctype, clength)
                 return result
+
+            #For purposes of inspection (not a good idea to change these otherwise you'll lose sync with the values closed over)
+            simple_method_wrapper.content_type = content_type
+            simple_method_wrapper.encoding = encoding
+            simple_method_wrapper.writer = writer
 
             self.dispatcher.add_handler(method, simple_method_wrapper)
             return simple_method_wrapper

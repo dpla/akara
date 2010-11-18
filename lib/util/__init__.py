@@ -6,8 +6,10 @@ import base64
 from functools import wraps
 from string import Template
 from wsgiref.util import request_uri
+from itertools import islice, dropwhile
 
 from amara.lib.iri import *
+from amara.lib.util import first_item
 
 from akara import logger
 
@@ -318,6 +320,21 @@ def copy_headers_to_dict(environ, exclude=[]):
             headers[pure_header] = v
     return headers
 
+
+def requested_imt(environ):
+    # Choose a preferred media type from the Accept header, using application/json as presumed
+    # default, and stripping out any wildcard types and type parameters
+    #
+    # FIXME Ideally, this should use the q values and pick the best media type, rather than
+    # just picking the first non-wildcard type.  Perhaps: http://code.google.com/p/mimeparse/
+    accepted_imts = []
+    accept_header = environ.get('HTTP_ACCEPT')
+    if accept_header :
+        accepted_imts = [ mt.split(';')[0] for mt in accept_header.split(',') ]
+    accepted_imts.append('application/json')
+    #if logger: logger.debug('accepted_imts: ' + repr(accepted_imts))
+    imt = first_item(dropwhile(lambda x: '*' in x, accepted_imts))
+    return imt
 
 #
 # ======================================================================
