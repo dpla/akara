@@ -141,6 +141,8 @@ NO_CACHE_PATH = module_config().get("NO_CACHE_PATH", None)
 # 
 #     : HTTP basic auth: http://www.voidspace.org.uk/python/articles/urllib2.shtml#id6
 for k, v in TARGET_WIKIS.items():
+    #The target wiki base URI must end in '/'
+    v = v.rstrip('/') + '/'
     (scheme, authority, path, query, fragment) = split_uri_ref(v)
     auth, host, port = split_authority(authority)
     authority = host + ':' + port if port else host
@@ -560,6 +562,7 @@ def dispatcher():
 
 @dispatcher.method("GET")
 def get_page(environ, start_response):
+    #logger.debug('get_page: ' + repr((environ['SCRIPT_NAME'], environ['PATH_INFO'])))
     req_headers = copy_headers_to_dict(environ,exclude=['HTTP_ACCEPT_ENCODING'])
     wiki_id, base, opener, original_page, wrapped_wiki_base = target(environ)
     page = environ['PATH_INFO'].lstrip('/')

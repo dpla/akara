@@ -24,6 +24,9 @@ Note: for a recipe for filtering the log entries, see:
 
 """
 
+#Note: this logger seems reliably multiprocess-friendly, but not a bad idea to bookmark:
+#"How should I log while using multiprocessing in Python?": http://stackoverflow.com/questions/641420/how-should-i-log-while-using-multiprocessing-in-python/894284#894284
+
 import sys
 import logging
 
