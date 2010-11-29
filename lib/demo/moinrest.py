@@ -101,13 +101,12 @@ from itertools import dropwhile
 # Amara Imports
 import amara
 from amara import bindery
-from amara.lib.util import first_item
-from amara.lib.iri import absolutize, relativize, join
 from amara.writers.struct import structencoder, E, NS, ROOT, RAW
 from amara.bindery.html import parse as htmlparse
 from amara.bindery.model import examplotron_model, generate_metadata
-from amara.lib.iri import split_fragment, relativize, absolutize, split_uri_ref, split_authority, unsplit_uri_ref
-from amara.lib.iri import split_uri_ref, unsplit_uri_ref, split_authority, absolutize
+from amara.lib.util import first_item
+from amara.lib.iri import absolutize, relativize, join
+from amara.lib.iri import split_fragment, split_uri_ref, unsplit_uri_ref, split_authority
 #from amara import inputsource
 
 # Akara Imports
@@ -721,10 +720,11 @@ def _put_page(environ, start_response):
     except urllib2.URLError,e:
         raise UnexpectedResponseError(url=url,code=e.code,error=str(e))
 
-    msg = 'Page updated OK: ' + url
+    wrapped_url = join(wrapped_wiki_base, page)
+    msg = 'Page updated OK: %s (%s)'%(url, wrapped_url)
     #response.add_header("Content-Length", str(len(msg)))
     moin_base_info = base + ' ' + wrapped_wiki_base + ' ' + original_page
-    start_response(status_response(httplib.CREATED), [("Content-Type", "text/plain"), ("Content-Location", url), (moin.ORIG_BASE_HEADER, moin_base_info)])
+    start_response(status_response(httplib.CREATED), [("Content-Type", "text/plain"), ("Content-Location", wrapped_url), (moin.ORIG_BASE_HEADER, moin_base_info)])
     return [msg]
 
 
