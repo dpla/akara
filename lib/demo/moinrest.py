@@ -131,7 +131,7 @@ DEFAULT_OPENER = urllib2.build_opener(
 CACHE_MAX_AGE = module_config().get("CACHE_MAX_AGE", None)
 
 # Specifies a Wiki path (currently only one, FIXME) under which no caching will occur
-NO_CACHE_PATH = module_config().get("NO_CACHE_PATH", None)
+NO_CACHE_PATHS = module_config().get("NO_CACHE_PATHS", None)
 
 # Look at each Wiki URL and build an appropriate opener object for retrieving
 # pages.   If the URL includes HTTP authentication information such as
@@ -576,7 +576,7 @@ def get_page(environ, start_response):
     #logger.debug('imt: ' + repr(imt))
     params_for_moin = {}
     cache_max_age = CACHE_MAX_AGE # max-age of this response. If set to None, it will not be used
-    if NO_CACHE_PATH and NO_CACHE_PATH in page:
+    if NO_CACHE_PATHS and first_item(dropwhile(lambda x: x not in page, NO_CACHE_PATHS)):
         cache_max_age = None
 
     if 'rev' in params:
@@ -677,7 +677,7 @@ def get_page(environ, start_response):
                             ("Vary", "Accept"),
                             (moin.ORIG_BASE_HEADER, moin_base_info)]
         if cache_max_age:
-            response_headers.append(("Cache-Control","max-age="+cache_max_age))
+            response_headers.append(("Cache-Control","max-age="+str(cache_max_age)))
 
         start_response(status_response(status), response_headers)
         return rbody
