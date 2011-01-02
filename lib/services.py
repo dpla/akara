@@ -249,7 +249,7 @@ def _handle_notify_after(environ, result, service_list):
 
 
 def service(service_id, path=None,
-            encoding="utf-8", writer="xml",
+            content_type=None,encoding="utf-8", writer="xml",
             pipelines = None,
             query_template = None,
             wsgi_wrapper=None,

@@ -3,5 +3,5 @@ To run these tests use "nose" from
 
 or "easy_install nose". Once it's installed, run
 
-  nostests
+  nosetests
 

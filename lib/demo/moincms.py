@@ -139,7 +139,7 @@ class folder(webcms_node):
             print attachment
         return
 
-    node.NODES[folder.AKARA_TYPE] = folder
+node.NODES[folder.AKARA_TYPE] = folder
 
 
 class page(webcms_node):
