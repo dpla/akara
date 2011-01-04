@@ -14,7 +14,11 @@ from amara.lib.util import first_item
 from akara import logger
 
 def status_response(code):
-    return '%i %s'%(code, httplib.responses[code])
+    if isinstance(code,int):
+        ret = '%i %s'%(code, httplib.responses[code])
+    else: # string/unicode
+        ret = code
+    return ret
 
 class iterwrapper:
     """
