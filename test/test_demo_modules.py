@@ -74,6 +74,11 @@ def test_calendar():
 def test_ical2json():
     import simplejson
 
+    # If we can't import icalendar, then the server will fail this test, so
+    # importing it here forces reporting the issue as an error instead of a
+    # failure
+    import icalendar
+
     ical_filename = os.path.join(RESOURCE_DIR, "icalendar_test.ics")
     url = server() + "ical.json"
 
