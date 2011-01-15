@@ -14,10 +14,20 @@ from amara.lib.util import first_item
 from akara import logger
 
 def status_response(code):
-    if isinstance(code,int):
-        ret = '%i %s'%(code, httplib.responses[code])
+    """
+    Given an int or string, return the HTTP status line
+    """
+    # If code is already a full status line, let it pass through,
+    # but if just a response code as a string, convert to int
+    try:
+        c = int(code)
+    except ValueError:
+        c = code
+
+    if isinstance(c,int):
+        ret = '%i %s'%(c, httplib.responses[c])
     else: # string/unicode
-        ret = code
+        ret = c
     return ret
 
 class iterwrapper:
