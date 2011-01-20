@@ -114,7 +114,7 @@ from akara import module_config, logger, response
 from akara.util import multipart_post_handler, wsgibase, http_method_handler, copy_headers_to_dict
 from akara.services import method_dispatcher
 from akara.util import status_response, read_http_body_to_temp
-from akara.util import BadTargetError, HTTPAuthorizationError, MoinAuthorizationError, UnexpectedResponseError, MoinMustAuthenticateError, MoinNotFoundError, ContentLengthRequiredError, GenericClientError
+from akara.util import BadTargetError, HTTPAuthorizationError, MoinAuthorizationError, UnexpectedResponseError, MoinMustAuthenticateError, MoinNotFoundError, ContentLengthRequiredError, GenericClientError, ConflictError
 import akara.util.moin as moin
 
 # ======================================================================
@@ -323,6 +323,13 @@ def moin_error_wrapper(wsgiapp):
                     ])
             return e.parms.get('error')
 
+        # For editing (PUT) conflicts detected in 2xx responses
+        except ConflictError,e:
+            start_response(status_response(httplib.CONFLICT), [
+                    ('Content-Type','text/plain')
+                    ])
+            return e.parms.get('error')
+
     return handler
 
 
@@ -453,7 +460,7 @@ def fill_attachment_form(page, attachment, wiki_id, base, opener, headers=None):
         if e.code == 403 or e.code == 404:
             raise MoinMustAuthenticateError(url=request.get_full_url(),target=wiki_id)
         else:
-            raise UnexpectedResponse(url=request.get_full_url(),code=e.code,error=str(e))
+            raise UnexpectedResponseError(url=request.get_full_url(),code=e.code,error=str(e))
 
     form = doc.html.body.xml_select(u'.//*[@id="content"]/form')[0]
     form_vars = {}
@@ -511,7 +518,7 @@ def scrape_page_history(page, base, opener, headers=None):
         if e.code == 403 or e.code == 404:
             raise MoinMustAuthenticateError(url=request.get_full_url(),target=wiki_id)
         else:
-            raise UnexpectedResponse(url=request.get_full_url(),code=e.code,error=str(e))
+            raise UnexpectedResponseError(url=request.get_full_url(),code=e.code,error=str(e))
 
     info = []
     try:
@@ -535,7 +542,17 @@ def scrape_page_history(page, base, opener, headers=None):
 # Extract any error embedded in an HTML response (returned by Moin in 2xx responses),
 # and raise it as an HTTP error.  Would be nice to handle this generically in
 # moin_error_wrapper, but don't want to incur HTML parse cost
+#
 def raise_embedded_error(doc):
+
+    try:
+        edit_textarea = doc.xml_select(u'.//*[@id="editor-textarea"]/text()')
+    except:
+        pass
+
+    if edit_textarea and 'End of edit conflict' in edit_textarea:
+        raise ConflictError(error=edit_textarea)
+
     try:
         error_div = doc.xml_select('//div[@class="error"]')
     except:
@@ -543,6 +560,7 @@ def raise_embedded_error(doc):
 
     if error_div:
         raise GenericClientError(error=error_div.asString())
+
 
 # ----------------------------------------------------------------------
 #                       HTTP Method Handlers

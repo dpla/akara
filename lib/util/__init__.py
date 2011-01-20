@@ -376,3 +376,4 @@ class MoinMustAuthenticateError(HttpError): pass
 class MoinNotFoundError(HttpError): pass
 class ContentLengthRequiredError(HttpError): pass
 class GenericClientError(HttpError): pass
+class ConflictError(HttpError): pass
