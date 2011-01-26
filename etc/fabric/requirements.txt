@@ -1,6 +1,13 @@
+html5lib 
+httplib2 
 python-dateutil
+simplejson
 feedparser
+xlrd
 
-hg+http://bitbucket.org/uche/amara#egg=amara
-hg+http://bitbucket.org/uche/akara#egg=akara
+hg+http://foundry.zepheira.com/hg/zen/#egg=zen
+git+http://github.com/zepheira/akara.git#egg=akara
+git+http://github.com/zepheira/amara.git#egg=amara
 
+#--find-links http://foundry.zepheira.com/projects/zen/files
+#zenlib

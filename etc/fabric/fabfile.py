@@ -263,11 +263,11 @@ def register_module(module=env.module, target_module=env.target_module,
     if not target_module:
         target_module = module
     _read_remote_config(virtualenv, base_path)
-    path = posixpath.join(base_path, virtualenv, "modules",
-                          "%s.py"%target_module)
 
-    script = """import imp
+    with cd( posixpath.join(base_path, virtualenv) ):
 
-(f, pathname, description) = imp.find_module('%s')
-exec f.read() in globals()"""%module
-
+        new_conf = sudo("sed '/MODULES =/ a \    \"%s\",' < akara.conf > akara.conf.tmp"%target_module,user=env.owner)
+        if new_conf.failed:
+            abort("Unable to register module")
+        else:
+            sudo("mv akara.conf.tmp akara.conf",user=env.owner)
