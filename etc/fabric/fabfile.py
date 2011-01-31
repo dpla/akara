@@ -247,6 +247,7 @@ def print_config(virtualenv=env.virtualenv, base_path=env.base_path):
 
 def register_module(module=env.module, target_module=env.target_module,
                     virtualenv=env.virtualenv,
+                    config_file=None,
                     base_path=env.base_path):
     """
     Registers a module with akara.  The akara service should be stopped before
@@ -271,3 +272,13 @@ def register_module(module=env.module, target_module=env.target_module,
             abort("Unable to register module")
         else:
             sudo("mv akara.conf.tmp akara.conf",user=env.owner)
+
+        # If config_file is specified, upload it and insert into akara.conf
+        if config_file:
+            put(config_file,'/tmp/akara-conf-add.txt')
+            new_conf = sudo("sed '/Section 3:/ r /tmp/akara-conf-add.txt' < akara.conf > akara.conf.tmp",user=env.owner)
+            if new_conf.failed:
+                abort("Unable to insert module configuration into akara.conf")
+            else:
+                sudo("mv akara.conf.tmp akara.conf",user=env.owner)
+            sudo('rm -f /tmp/akara-conf-add.txt')
