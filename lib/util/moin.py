@@ -16,7 +16,7 @@ Project home, documentation, distributions: http://wiki.xml3k.org/Akara
 __all__ = [
     "WIKITEXT_IMT", "DOCBOOK_IMT", "RDF_IMT", "HTML_IMT", "ATTACHMENTS_IMT",
     "ORIG_BASE_HEADER", "ATTACHMENTS_MODEL_XML", "ATTACHMENTS_MODEL",
-    "MOIN_DOCBOOK_MODEL_XML", "MOIN_DOCBOOK_MODEL",
+    "MOIN_DOCBOOK_MODEL_XML", "MOIN_DOCBOOK_MODEL", "WIKI_RELATIVE_HEADER"
 ]
 
 #import pprint
@@ -50,6 +50,7 @@ DOCBOOK_IMT = 'application/docbook+xml'
 RDF_IMT = 'application/rdf+xml'
 ATTACHMENTS_IMT = 'application/x-moin-attachments+xml'
 ORIG_BASE_HEADER = 'x-akara-wrapped-moin'
+WIKI_RELATIVE_HEADER = 'x-wiki-relative-location'
 
 #Note: this requires the user to install the demo/etc/application_xml.py (a fixed Moin XML formatter) in plugin/formatter/ for th eMoin instance
 XML_IMT = 'application/xml'

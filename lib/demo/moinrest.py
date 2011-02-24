@@ -742,7 +742,13 @@ def _put_page(environ, start_response):
     msg = 'Page updated OK: %s (%s)'%(url, wrapped_url)
     #response.add_header("Content-Length", str(len(msg)))
     moin_base_info = base + ' ' + wrapped_wiki_base + ' ' + original_page
-    start_response(status_response(httplib.CREATED), [("Content-Type", "text/plain"), ("Content-Location", wrapped_url), (moin.ORIG_BASE_HEADER, moin_base_info)])
+    headers = [
+        ("Content-Type", "text/plain"),
+        ("Content-Location", wrapped_url),
+        (moin.ORIG_BASE_HEADER, moin_base_info),
+        (moin.WIKI_RELATIVE_HEADER, relativize(wrapped_url, wrapped_wiki_base)),
+        ]
+    start_response(status_response(httplib.CREATED), headers)
     return [msg]
 
 
@@ -793,7 +799,13 @@ def post_page(environ, start_response):
 
     #response.add_header("Content-Length", str(len(msg)))
     moin_base_info = base + ' ' + wrapped_wiki_base + ' ' + original_page
-    start_response(status_response(httplib.CREATED), [("Content-Type", "text/plain"), ("Content-Location", url), (moin.ORIG_BASE_HEADER, moin_base_info)])
+    headers = [
+        ("Content-Type", "text/plain"),
+        ("Content-Location", url),
+        (moin.ORIG_BASE_HEADER, moin_base_info),
+        (moin.WIKI_RELATIVE_HEADER, relativize(url, wrapped_wiki_base)),
+        ]
+    start_response(status_response(httplib.CREATED), headers)
     return msg
 
 # DELETE handler

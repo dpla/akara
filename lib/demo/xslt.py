@@ -28,7 +28,7 @@ XPATH_SERVICE_ID = 'http://purl.org/akara/services/demo/xpath'
 
 
 DEFAULT_TRANSFORM = akara.module_config().get('default_transform')
-URI_SPACE = akara.module_config().get('uri_space', 'http://hg.akara.info/').split()
+URI_SPACE = akara.module_config().get('uri_space', 'http://github.com/zepheira').split()
 #print DEFAULT_TRANSFORM
 
 #FIXME! The core URI auth code is tested, but not the use in this module
