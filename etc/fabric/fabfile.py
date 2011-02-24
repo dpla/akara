@@ -74,7 +74,8 @@ def prepare(upgrade=True):
 
 def create_virtualenv(virtualenv=env.virtualenv, 
                       owner=env.owner,
-                      base_path=env.base_path):
+                      base_path=env.base_path,
+                      use_site_packages='false'):
     """
     Creates a new virtual environment
 
@@ -84,7 +85,12 @@ def create_virtualenv(virtualenv=env.virtualenv,
         base_path -- the directory in which to create the virtualenv
     """
     path = posixpath.join(base_path, virtualenv)
-    sudo("%s --distribute --no-site-packages %s" % (env.virtualenv_exe,path)) 
+    if use_site_packages == 'true':
+        site_packages = ''
+    else:
+        site_packages = '--no-site-packages'
+
+    sudo("%s --distribute %s %s" % (env.virtualenv_exe, site_packages, path)) 
     if owner:
         sudo("chown -R %s:%s %s"%(owner, owner,path))
 
@@ -135,7 +141,8 @@ def install(virtualenv=env.virtualenv,
             requirements=env.requirements,
             owner=env.owner, 
             service_port=env.service_port, 
-            base_path=env.base_path):
+            base_path=env.base_path,
+            use_site_packages='false'):
     """
     Installs an akara instance from scratch
 
@@ -146,7 +153,7 @@ def install(virtualenv=env.virtualenv,
         service_port -- the port on which akara should run
         owner -- the username that owns the virtualenv
     """
-    create_virtualenv(virtualenv, owner, base_path)   
+    create_virtualenv(virtualenv, owner, base_path, use_site_packages=use_site_packages)
     _write_remote_config(virtualenv, owner, service_port, base_path)
     install_requirements(virtualenv, requirements, base_path)
     setup_akara(virtualenv, base_path)
