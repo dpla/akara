@@ -459,8 +459,8 @@ def test_template5():
     from akara.registry import get_internal_service_url, get_service_url
     import akara.global_config
 
-    yield "server_path: " + akara.global_config.server_path + "\n"
-    yield "internal_server_path: " + akara.global_config.internal_server_path + "\n"
+    yield "server_root: " + akara.global_config.server_root + "\n"
+    yield "internal_server_root: " + akara.global_config.internal_server_root + "\n"
 
     try:
         # Check that the substitution works as expected
@@ -506,11 +506,11 @@ def extra_registration():
      <path template="%stest_echo_simple_get?foo={bar}">test_echo_simple_get</path>
   </service>
 </services>
-""" % (akara.global_config.internal_server_path,)
+""" % (akara.global_config.internal_server_root,)
 
 
 register_template("urn:service_reg:1",
-                  akara.global_config.internal_server_path +
+                  akara.global_config.internal_server_root +
                   "test.template1?name={x}&language=FORTRAN")
 
 # Attempt to override a local handler.
@@ -521,7 +521,7 @@ register_template("http://purl.org/xml3k/akara/services/registry",
 # GRR! This doesn't work. I can't register myself during import
 # time because the server isn't running during import.
 def _delayed_install():
-    register_services(akara.global_config.internal_server_path + "extra_registration")
+    register_services(akara.global_config.internal_server_root + "extra_registration")
 
 @simple_service("GET", "urn.akara.test:extra_call")
 def test_extra_call(service_id, **kwargs):

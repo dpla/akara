@@ -41,7 +41,7 @@ def _override_server_uri():
     return "http://" + server + "/"
     
 SERVER_URI = _override_server_uri()
-server_root = None
+config_root = None
 config_filename = None
 server_pid = None
 server_did_not_start = False
@@ -49,17 +49,17 @@ server_did_not_start = False
 # Create a temporary directory structure for Akara.
 # Needs a configuration .ini file and the logs subdirectory.
 def create_server_dir(port):
-    global server_root, config_filename
+    global config_root, config_filename
     
-    server_root = tempfile.mkdtemp(prefix="akara_test_")
-    config_filename = os.path.join(server_root, "akara_test.config")
+    config_root = tempfile.mkdtemp(prefix="akara_test_")
+    config_filename = os.path.join(config_root, "akara_test.config")
 
     f = open(config_filename, "w")
     f.write("""
 class Akara:
-  ServerRoot = %(server_root)r
-  ServerPath = 'http://dalkescientific.com/'
-  InternalServerPath = 'http://localhost:%(port)s/'
+  ConfigRoot = %(server_root)r
+  ServerRoot = 'http://dalkescientific.com/'
+  InternalServerRoot = 'http://localhost:%(port)s/'
   Listen = 'localhost:%(port)s'
   LogLevel = 'DEBUG'
   MinSpareServers = 3
@@ -107,14 +107,14 @@ MODULES = ["akara.demo.akara_tests",
            "akara.demo.xslt",
 ]           
 
-""" % dict(server_root = server_root,
+""" % dict(config_root = config_root,
            port = port,
            atom_entries = os.path.join(ATOM_ENTRIES, "*.atom"),
            resource_dir = os.path.join(dirname(abspath(__file__)), "resource"),
            ))
     f.close()
 
-    os.mkdir(os.path.join(server_root, "logs"))
+    os.mkdir(os.path.join(config_root, "logs"))
 
 #FIXME: add back config for:
 #[collection]
@@ -123,20 +123,20 @@ MODULES = ["akara.demo.akara_tests",
 # Remove the temporary server configuration directory,
 # if I created it
 def remove_server_dir():
-    global server_pid, server_root
+    global server_pid, config_root
     if server_pid is not None:
         # I created the server, I kill it
         os.kill(server_pid, signal.SIGTERM)
         server_pid = None
 
-    if server_root is not None:
+    if config_root is not None:
         # Very useful when doing development and testing.
         # Would like this as a command-line option somehow.
         if DELETE_TEMPORARY_SERVER_DIRECTORY:
-            shutil.rmtree(server_root)
+            shutil.rmtree(config_root)
         else:
-            print "Test server configuration and log files are in", server_root
-        server_root = None
+            print "Test server configuration and log files are in", config_root
+        config_root = None
 
 atexit.register(remove_server_dir)
 
@@ -162,14 +162,14 @@ def start_server():
     # Akara started, but it might have failed during startup.
     # Report errors by reading the error log
     if result != 0:
-        f = open(os.path.join(server_root, "logs", "error.log"))
+        f = open(os.path.join(config_root, "logs", "error.log"))
         err_text = f.read()
         raise AssertionError("Could not start %r:\n%s" % (args, err_text))
 
     # Akara server started in the background. The main
     # process will only exit with a success (0) if the
     # pid file has been created.
-    f = open(os.path.join(server_root, "logs", "akara.pid"))
+    f = open(os.path.join(config_root, "logs", "akara.pid"))
     line = f.readline()
     f.close()
 
@@ -201,7 +201,7 @@ def check_that_server_is_available(port):
             urllib2.urlopen("http://localhost:%d/" % port).read()
         except urllib2.URLError, err:
             print "Current error log is:"
-            f = open(os.path.join(server_root, "logs", "error.log"))
+            f = open(os.path.join(config_root, "logs", "error.log"))
             err_text = f.read()
             print err_text
             raise

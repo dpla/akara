@@ -42,7 +42,7 @@ def akara_sysinfo():
     body = 'environ'
     body += '\n'
     body += pprint.pformat(request.environ)
-    body += '\n'
+    body += '\n\n'
     body += 'global_config'
     body += '\n'
     body += pprint.pformat(gdict)

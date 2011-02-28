@@ -447,8 +447,8 @@ def test_templates():
 def test_template_expansion():
     body = GET("test_template5")
     lines = body.splitlines()
-    expected = ["server_path: http://dalkescientific.com/",
-                "internal_server_path: " + server_support.SERVER_URI]
+    expected = ["server_root: http://dalkescientific.com/",
+                "internal_server_root: " + server_support.SERVER_URI]
     for base_uri in (server_support.SERVER_URI,
                      "http://dalkescientific.com/"):
         for suffix in (

@@ -59,7 +59,7 @@ class Service(object):
             # No template available
             self._template = False
             return None
-        template = global_config.server_path + self.query_template
+        template = global_config.server_root + self.query_template
         self._template = opensearch.make_template(template)
         return self._template
 
@@ -76,7 +76,7 @@ class Service(object):
             # No template available
             self._internal_template = False
             return None
-        internal_template = global_config.internal_server_path + self.query_template
+        internal_template = global_config.internal_server_root + self.query_template
         self._internal_template = opensearch.make_template(internal_template)
         return self._internal_template
     

@@ -1,4 +1,5 @@
 python-dateutil
+#Most people can probably remove the next line
 feedparser
 
 git+http://github.com/zepheira/akara.git#egg=akara

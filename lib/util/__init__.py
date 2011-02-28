@@ -8,10 +8,12 @@ from string import Template
 from wsgiref.util import request_uri
 from itertools import islice, dropwhile
 
-from amara.lib.iri import *
+#from amara.lib.iri import *
+from amara.lib.iri import absolutize, join#, split_uri_ref
 from amara.lib.util import first_item
 
 from akara import logger
+from akara import global_config
 
 def status_response(code):
     """
@@ -104,22 +106,30 @@ def guess_self_uri(environ):
     return absolutize(environ['SCRIPT_NAME'].rstrip('/'), request_uri(environ, include_query=False))
 
 
-def find_peer_service(environ, peer_id):
+def in_akara():
+    'Returns True if the current process is running as an Akara module'
+    return 'pid_file' in global_config.__dict__
+
+
+def find_peer_service(peer_id, environ=None):
     '''
     Find a peer service endpoint, by ID, mounted on this same Akara instance
     
     Must be caled from a running akara service, and it is highly recommended to call
     at the top of service functions, or at least before the request environ has been manipulated
     '''
-    from amara.lib.iri import absolutize, join
-    from akara import request
+    if not in_akara():
+        raise RuntimeError('find_peer_service is meant to be called from within Akara process space')
     from akara.registry import _current_registry
-    serverbase = guess_self_uri(environ)
+    from akara import request
+    if environ:
+        serverbase = guess_self_uri(environ)
+    else:
+        serverbase = getattr(global_config, 'server_root')
     for (path, s) in _current_registry._registered_services.iteritems():
         if s.ident == peer_id:
             return join(serverbase, '..', path)
     return None
-
 
 
 def http_method_handler(method):

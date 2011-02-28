@@ -14,9 +14,9 @@ DEFAULT_SERVER_CONFIG_FILE = os.path.expanduser("~/.config/akara.conf")
 
 class AkaraDefault:
     Listen = 8880
-    ServerRoot = "~/.local/lib/akara"
-    #"ServerPath": None
-    #"InternalServerPath": None
+    ConfigRoot = "~/.local/lib/akara"
+    #"ServerRoot": None
+    #"InternalServerRoot": None
     PidFile = "logs/akara.pid"
 
     MinSpareServers = 5
@@ -160,43 +160,43 @@ def _extract_settings(config):
     #  default but I'm not going to do a FQDN lookup here since that has
     #  side effects. Basically, if you need the name right, then set it.)
     try:
-        server_path = getstring('ServerPath')
+        server_root = getstring('ServerRoot')
     except Error:
         if port == 80:
             fmt = "http://%(host)s/"
         else:
             fmt = "http://%(host)s:%(port)s/"
-        server_path = fmt % dict(host = (host or "localhost"), port = port)
+        server_root = fmt % dict(host = (host or "localhost"), port = port)
         
     # Uses only when an Akara service wants to call another Akara service.
     # Needed for the (rare) cases when the listen server has a different
     # local name than the published server.
     try:
-        internal_server_path = getstring('InternalServerPath')
+        internal_server_root = getstring('InternalServerRoot')
     except Error:
-        internal_server_path = server_path
+        internal_server_root = server_root
         
-    settings["server_path"] = server_path
-    settings["internal_server_path"] = internal_server_path
+    settings["server_root"] = server_root
+    settings["internal_server_root"] = internal_server_root
 
-    server_root = getstring('ServerRoot')
-    server_root = os.path.expanduser(server_root)
-    settings["server_root"] = os.path.abspath(server_root)
+    config_root = getstring('ConfigRoot')
+    config_root = os.path.expanduser(config_root)
+    settings["config_root"] = os.path.abspath(config_root)
 
     pid_file = getstring('PidFile')
-    settings["pid_file"] = os.path.join(server_root, pid_file)
+    settings["pid_file"] = os.path.join(config_root, pid_file)
 
     error_log = getstring('ErrorLog')
-    settings["error_log"] = os.path.join(server_root, error_log)
+    settings["error_log"] = os.path.join(config_root, error_log)
 
     access_log = getstring('AccessLog')
-    settings["access_log"] = os.path.join(server_root, access_log)
+    settings["access_log"] = os.path.join(config_root, access_log)
 
     module_dir = getstring("ModuleDir")
-    settings["module_dir"] = os.path.join(server_root, module_dir)
+    settings["module_dir"] = os.path.join(config_root, module_dir)
     
     module_cache = getstring("ModuleCache")
-    settings["module_cache"] = os.path.join(server_root, module_cache)
+    settings["module_cache"] = os.path.join(config_root, module_cache)
 
     log_level_orig = getstring('LogLevel')
     log_level_s = log_level_orig.upper()

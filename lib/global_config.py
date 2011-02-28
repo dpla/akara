@@ -7,9 +7,9 @@ by the read_config.py.
 Common configuration variables include:
 
 server_address         : (host,port) of the Akara server
-server_path            : public URL to the top-level of Akara
-internal_server_path   : internal URL to the top-level of Akara
-server_root            : Akara root directory (e.g., ~/.local/lib/akara)
+server_root            : public URL to the top-level of Akara
+internal_server_root   : internal URL to the top-level of Akara
+config_root            : Akara configuration root directory (e.g., ~/.local/lib/akara)
 pid_file               : Location of the PID file
 error_log              : Filename of the Akara error log
 access_log             : Filename of the Akara access log

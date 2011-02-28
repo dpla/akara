@@ -8,9 +8,9 @@ from cStringIO import StringIO
 from akara import commandline, read_config
 
 class Config(object):
-    def __init__(self, server_root):
-        self.config_filename = os.path.join(server_root, "pid_test.ini")
-        self.pid_filename = os.path.join(server_root, "pid.txt")
+    def __init__(self, config_root):
+        self.config_filename = os.path.join(config_root, "pid_test.ini")
+        self.pid_filename = os.path.join(config_root, "pid.txt")
     def save_pid(self, text):
         f = open(self.pid_filename, "w")
         try:
@@ -33,8 +33,8 @@ def tmpdir(func):
     return wrapper
 
 @tmpdir
-def test_get_pid(server_root):
-    config = Config(server_root)
+def test_get_pid(config_root):
+    config = Config(config_root)
     f = open(config.config_filename, "w")
     try:
         f.write("class Akara:\n  PidFile = %r\nMODULES=[]\n" % config.pid_filename)
@@ -80,8 +80,8 @@ class CaptureStdout(object):
         
 
 @tmpdir
-def test_status(server_root):
-    config = Config(server_root)
+def test_status(config_root):
+    config = Config(config_root)
     capture = CaptureStdout()
     with capture:
         try:
@@ -136,8 +136,8 @@ def test_status(server_root):
     # That test is done manually.
 
 @tmpdir
-def test_setup_config_file(server_root):
-    config_file = os.path.join(server_root, "blah_subdir", "test_config.ini")
+def test_setup_config_file(config_root):
+    config_file = os.path.join(config_root, "blah_subdir", "test_config.ini")
 
     assert not os.path.exists(config_file)
 
@@ -158,12 +158,12 @@ def test_setup_config_file(server_root):
     assert "Configuration file already exists" in capture.content
 
 @tmpdir
-def test_setup(server_root):
-    config = Config(server_root)
+def test_setup(config_root):
+    config = Config(config_root)
     capture = CaptureStdout()
 
     f = open(config.config_filename, "w")
-    f.write("class Akara: ServerRoot = %r\n" % server_root)
+    f.write("class Akara: ConfigRoot = %r\n" % config_root)
     f.close()
 
     with capture:
@@ -174,22 +174,22 @@ def test_setup(server_root):
     assert "PID file directory exists" in capture.content, capture.content
     assert "Created extension modules directory" in capture.content
     
-    assert os.path.exists(os.path.join(server_root, "logs"))
-    assert os.path.exists(os.path.join(server_root, "modules"))
+    assert os.path.exists(os.path.join(config_root, "logs"))
+    assert os.path.exists(os.path.join(config_root, "modules"))
 
 @tmpdir
-def test_log_rotate(server_root):
-    config = Config(server_root)
+def test_log_rotate(config_root):
+    config = Config(config_root)
     capture = CaptureStdout()
-    error_log_filename = os.path.join(server_root, "testing.log")
+    error_log_filename = os.path.join(config_root, "testing.log")
     
     def find_backup_logs():
-        return [name for name in os.listdir(server_root)
+        return [name for name in os.listdir(config_root)
                    if name.startswith("testing.log.")]
     
     with open(config.config_filename, "w") as f:
-        f.write("class Akara:\n  ServerRoot = %r\n  ErrorLog=%r\n" %
-                (server_root, error_log_filename))
+        f.write("class Akara:\n  ConfigRoot = %r\n  ErrorLog=%r\n" %
+                (config_root, error_log_filename))
 
     # No log file present
     with capture:
@@ -210,7 +210,7 @@ def test_log_rotate(server_root):
     assert len(filenames) == 1, ("should have one backup", filenames)
 
     # Check that the content rotated
-    content = open(os.path.join(server_root, filenames[0])).read()
+    content = open(os.path.join(config_root, filenames[0])).read()
     assert content == MESSAGE, (content, MESSAGE)
 
     # The log file should not be present
