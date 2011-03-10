@@ -36,10 +36,10 @@ def test_index_search():
 
 # atomtools.py
 def test_atom_json():
-    import simplejson
+    from amara.thirdparty import json
     url = server() + "akara.atom.json?url=http://zepheira.com/feed/atom/"
     response = urlopen(url)
-    results = simplejson.load(response)
+    results = json.load(response)
     items = results["items"]
     for item in items:
         assert "title" in item
@@ -53,10 +53,11 @@ def test_aggregate_atom():
     assert len(doc.feed.entry) == 3, len(doc.feed.entry)
 
 def test_webfeedjson():
-    import simplejson
+    from amara.thirdparty import json
+    import json
     url = server() + "akara.webfeed.json?url=http://feeds.delicious.com/v2/rss/recent%3Fmin=1%26count=15"
     response = urlopen(url)
-    results = simplejson.load(response)
+    results = json.load(response)
     print results
 
 # calweb.py
@@ -72,7 +73,7 @@ def test_calendar():
 # icaltools.py
 
 def test_ical2json():
-    import simplejson
+    from amara.thirdparty import json
 
     ical_filename = os.path.join(RESOURCE_DIR, "icalendar_test.ics")
     url = server() + "ical.json"
@@ -83,7 +84,7 @@ def test_ical2json():
     data = open(ical_filename).read()
 
     response = urllib2.urlopen(req, data)
-    results = simplejson.load(response)
+    results = json.load(response)
 
     items = results["items"]
     assert len(items) == 2
@@ -159,9 +160,9 @@ def test_method_dispatcher_post():
 # rdfatools.py
 
 def test_rdfa2json():
-    import simplejson
+    from amara.thirdparty import json
     url = server() + "akara.rdfa.json?url=http://zepheira.com/"
-    results = simplejson.load(urllib2.urlopen(url))
+    results = json.load(urllib2.urlopen(url))
     for item in results["items"]:
         if "canonical" in item:
             assert "zepheira.com" in item["canonical"]
@@ -171,9 +172,9 @@ def test_rdfa2json():
 
 
 def test_rdfa2json_with_date():
-    import simplejson
+    from amara.thirdparty import json
     url = server() + "akara.rdfa.json?url=http://www.myspace.com/parishilton"
-    results = simplejson.load(urllib2.urlopen(url))
+    results = json.load(urllib2.urlopen(url))
     for item in results["items"]:
         if "canonical" in item:
             assert True
@@ -276,12 +277,12 @@ def test_charsearch():
 
 _apache_query_data = open(os.path.join(RESOURCE_DIR, "widefinder_100.apache_log")).read()
 def _make_log2json_request(query_args):
-    import simplejson
+    from amara.thirdparty import json
     url = server() + "akara.wwwlog.json" + query_args
     req = urllib2.Request(url)
     req.add_header("Content-Type", "text/plain")
     response = urllib2.urlopen(req, _apache_query_data)
-    return simplejson.load(response)
+    return json.load(response)
 
 def test_wwwlog2json():
     results = _make_log2json_request("")

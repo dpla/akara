@@ -5,8 +5,7 @@ import sys, time
 import urllib2
 from gettext import gettext as _
 
-# Third-party package from http://code.google.com/p/simplejson/
-import simplejson
+from amara.thirdparty import json
 
 from amara.lib.util import *
 from amara.tools import rdfascrape
@@ -27,7 +26,7 @@ def rdfa2json(url=None):
     if url is None:
         raise AssertionError(URL_REQUIRED)
     resources = rdfaparse(url)
-    return simplejson.dumps({'items': resources}, indent=4)
+    return json.dumps({'items': resources}, indent=4)
     
 
 def rdfaparse(content):

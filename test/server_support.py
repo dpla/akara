@@ -57,7 +57,7 @@ def create_server_dir(port):
     f = open(config_filename, "w")
     f.write("""
 class Akara:
-  ConfigRoot = %(server_root)r
+  ConfigRoot = %(config_root)r
   ServerRoot = 'http://dalkescientific.com/'
   InternalServerRoot = 'http://localhost:%(port)s/'
   Listen = 'localhost:%(port)s'

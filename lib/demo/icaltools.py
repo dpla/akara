@@ -6,7 +6,7 @@ easy_install icalendar
 
 import urllib2
 
-import simplejson
+from amara.thirdparty import json
 
 # Top-level import errors cause an infinite loop problem (see trac #6)
 # If this third-party package doesn't exist, report the problem but
@@ -53,6 +53,6 @@ def ical2json(body, ctype):
             entry['timestamp'] = component['DTSTAMP'].dt.isoformat()
 
         entries.append(entry)
-    return simplejson.dumps({'items': entries}, indent=4)
+    return json.dumps({'items': entries}, indent=4)
 
 
