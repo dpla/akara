@@ -1,6 +1,25 @@
 # -*- encoding: utf-8 -*-
 '''
-See also:
+See also: http://broadcast.oreilly.com/2009/04/data-chef-spss-tripe-consomme.html
+
+----
+
+Python interfaces to R
+Create new topic
+ 
+there seems to be many... e.g. RSPython, rpy, and even a redesigned version rpy2 (see http://rpy.sourceforge.net) -- what works well for you, and why?
+rsvp 2 days ago
+ 
+My *nix alternative would be to use <<HereDocument scripting with Python and R within a bash script to also get access to the shell as a bonus feature.
+rsvp 2 days ago
+ 
+Relatively new interface called "PypeR" -- see http://www.jstatsoft.org/v35/c02/paper for PDF or for the source code http://rinpy.sourceforge.net/
+rsvp about 16 hours ago
+ 
+Ryan Rosario gives a walkthrough of his data mining code using RPy2 as interface to R, http://www.bytemining.com/2010/10/accessing-r-from-python-using-rpy2/ -- the video gets going after the first ten minutes (35 minutes total running time). The caveats he points out are worth noting.
+
+(from https://convore.com/rstats/python-interfaces-to-r/ )
+
 '''
 
 from __future__ import with_statement

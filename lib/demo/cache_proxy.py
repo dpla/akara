@@ -7,7 +7,7 @@ provided under the Apache 2.0 license.
 See the files LICENSE and NOTICE for details.
 Project home, documentation, distributions: http://wiki.xml3k.org/Akara
 
- Module name:: cache_proxy
+ Module name:: akara.demo.cache_proxy
 
 Proxies a remote URL to add cache headers to GET requests
 
@@ -17,11 +17,20 @@ http://purl.org/akara/services/demo/cache-proxy (akara.cache-proxy) Handles GET
 
 = Configuration =
 
-No configuration required
+class cache_proxy:
+    maxlen = {
+      None: 3600,
+      "http://poems.com": 24*3600,
+      "http://poemtree.com": 24*3600,
+      "http://www.poemtree.com": 24*3600,
+    }
 
 = Notes on security =
 
-This module makes a remote GET request
+This module makes a remote GET request, and rewrites their headers
+
+= Notes on security =
+
 '''
 
 import amara
