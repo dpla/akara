@@ -60,6 +60,7 @@ def akara_cache_proxy(url=None):
     Sample request:
     curl -I "http://localhost:8880/akara.cache-proxy?url=http://poemtree.com/poems/UsefulAdvice.htm"
     '''
+    logger.debug('remote URL {0}: '.format(repr(url)))
     if not url:
         raise ValueError('url query parameter required')
     resp, content = H.request(url)
@@ -75,8 +76,9 @@ def akara_cache_proxy(url=None):
     logger.debug('remote response headers {0}: '.format(repr(resp)))
     #Oof. What about 'transfer-encoding' and other such headers
     for k in resp:
-        if k not in ('status',):
+        if k not in ('status', 'transfer-encoding', 'content-length'):
             response.add_header(k, resp[k])
     #response.add_header(k, resp[k])
+    #FIXME: This might distort return encoding, which would of course throw off content length & encoding.  Workaround for now is removal of e.g. transfer-encoding (above)
     return content
 
