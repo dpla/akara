@@ -32,6 +32,10 @@ def status_response(code):
         ret = c
     return ret
 
+# Convert a lower case header name into its RFC 2616-defined equivalent.
+# Useful when bridging httplib2 and WSGI.
+normalize_http_header_name = lambda h: '-'.join([s.capitalize() for s in h.split('-')])
+
 class iterwrapper:
     """
     Wraps the response body iterator from the application to meet WSGI
