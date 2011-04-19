@@ -24,7 +24,7 @@ class cache_proxy:
       "http://poemtree.com": 24*3600,
       "http://www.poemtree.com": 24*3600,
     }
-    OVERRIDE_STALE = True
+    override_stale = 1
 
 = Notes on security =
 
