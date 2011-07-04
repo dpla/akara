@@ -303,7 +303,6 @@ def simple_service(method, service_id, path=None,
                    query_template=None,
                    wsgi_wrapper=None,
                    notify_before=None, notify_after=None):
-    _no_slashes(path)
     """Add the function as an Akara resource
 
     These affect how the resource is registered in Akara

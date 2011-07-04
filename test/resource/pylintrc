@@ -1,6 +1,15 @@
+#To use:
+#pip install pylint
+#pylint --rcfile=~/dev/akara/test/resource/pylintrc my_akara_project
+
 # Configuration file for pylint (http://www.logilab.org/project/pylint). See
 # http://www.logilab.org/card/pylintfeatures for more detailed variable
 # descriptions.
+
+#See also:
+# https://github.com/lincolnloop/django-startproject/blob/master/django_startproject/project_template/.pylintrc (for DJango projects)
+# http://pypi.python.org/pypi/pyflakes
+# http://stackoverflow.com/questions/35470/are-there-any-static-analysis-tools-for-python
 
 [MASTER]
 profile = no
@@ -67,7 +76,7 @@ int-import-graph =
 [FORMAT]
 max-line-length = 80
 max-module-lines = 1000
-indent-string = "  "
+indent-string = "    "
 
 [MISCELLANEOUS]
 notes = FIXME,XXX,TODO

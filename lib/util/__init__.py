@@ -113,6 +113,7 @@ def in_akara():
 
 def find_peer_service(peer_id, environ=None):
     '''
+    DEPRECATED! Use discover_service() and work with the resulting query_template property
     Find a peer service endpoint, by ID, mounted on this same Akara instance
     
     Must be caled from a running akara service, and it is highly recommended to call
@@ -130,6 +131,45 @@ def find_peer_service(peer_id, environ=None):
         if s.ident == peer_id:
             return join(serverbase, '..', path)
     return None
+
+
+def discover_service(sid):
+    '''
+    Discover a service in the current environment with the given ID
+    It might be a peer, mounted on this same Akara instance, or it might
+    Be a proxy for a remote Web service
+    
+    Must be called from a running akara service
+
+    Note if you were using the deprecated
+    find_peer_service(peer_id, environ=None) switch to this:
+    >>> s = discover_service(peer_id)
+    >>> url = join(server_call_base(environ), '..', path)
+    '''
+    if not in_akara():
+        raise RuntimeError('find_peer_service is meant to be called from within Akara process space')
+    from akara.registry import _current_registry
+    from akara import request
+    for (path, s) in _current_registry._registered_services.iteritems():
+        if s.ident == peer_id:
+            return s
+    return None
+
+
+def server_call_base(environ=None):
+    '''
+    Determine the best base URL for calling a peer service on this Akara instance
+    
+    Must be called from a running akara service, and it is highly recommended to call
+    at the top of service functions, or at least before the request environ has been manipulated
+    '''
+    if not in_akara():
+        raise RuntimeError('find_peer_service is meant to be called from within Akara process space')
+    if environ:
+        serverbase = guess_self_uri(environ)
+    else:
+        serverbase = getattr(global_config, 'server_root')
+    return serverbase
 
 
 def http_method_handler(method):
