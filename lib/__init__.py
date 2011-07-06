@@ -170,4 +170,6 @@ class NoModuleConfig(object):
 
         return default
 
-from version import __version__
+
+from version import version_info
+__version__ = '.'.join(version_info)
