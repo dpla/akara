@@ -90,6 +90,8 @@ def renamed_packages():
 setuptools_extras["packages"] = renamed_packages()
 
 execfile('lib/version.py')
+__version__ = '.'.join(version_info)
+
 
 setup(name = "Akara",
       version=__version__,
