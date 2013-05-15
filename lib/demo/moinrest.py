@@ -351,7 +351,10 @@ def target(environ):
         raise BadTargetError(fronturl=request_uri(environ), target=wiki_id)
     original_page = join(TARGET_WIKIS[wiki_id].rstrip('/')+'/', environ['PATH_INFO'].lstrip('/'))
     #relative_to_wrapped = relativize(, full_incoming_request)
-    wrapped_wiki_base = full_incoming_request[:-len(environ['PATH_INFO'])]
+    if len(environ['PATH_INFO']) > 0:
+        wrapped_wiki_base = full_incoming_request[:-len(environ['PATH_INFO'])]
+    else:
+        wrapped_wiki_base = full_incoming_request
     return wiki_id, TARGET_WIKIS[wiki_id], TARGET_WIKI_OPENERS.get(wiki_id), original_page, wrapped_wiki_base
 
 
@@ -555,6 +558,8 @@ def raise_embedded_error(doc):
 
     try:
         error_div = doc.xml_select('//div[@class="error"]')
+        if 'You did not change the page content' in error_div: # not really an error
+            return
     except:
         return
 
