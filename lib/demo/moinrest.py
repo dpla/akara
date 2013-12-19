@@ -374,7 +374,7 @@ def check_auth(environ, start_response, base, opener, headers=None):
     if scheme.lower() != 'basic':
         raise RuntimeError('Unsupported HTTP auth scheme: %s'%scheme)
     username, password = data.decode('base64').split(':', 1)
-    url = absolutize('?action=login&name=%s&password=%s&login=login'%(username, password), base)
+    url = absolutize('?action=login&name=%s&password=%s&login=login'%(username, urllib.quote(password)), base)
     request = urllib2.Request(url, None, headers)
     try:
         with closing(opener.open(request)) as resp:
