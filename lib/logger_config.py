@@ -57,6 +57,17 @@ logging.addLevelName(STDOUT, "stdout")
 _current_handler = None
 
 
+class AccessLogger(object):
+    """Access log writer.  Logs HTTP requests."""
+    access_log_fh = None
+
+    def __init__(self, filename):
+        self.access_log_fh = open(filename, 'w', 0)
+
+    def write(self, s):
+        self.access_log_fh.write("%s\n" % s)
+
+
 def set_logfile(f):
     """Direct (or redirect) error logging to a file handle"""
     global _current_handler
@@ -114,28 +125,5 @@ def redirect_stdio():
     sys.stdout = WriteToLogger(STDOUT)
     sys.stderr = WriteToLogger(STDERR)
 
-########  Access logger
 
-# Use the logging mechanism to deal with access logging
 
-# I think this is a bit more cute than I would like.
-# Log at the DEBUG level to akara.access.
-# That always writes to the _access_logger because of the .setLevel(DEBUG)
-# The log event trickles up to the 'akara' logger.
-# That only displays in debug mode (most likely with -X)
-#  Downside: it displays with the standard Akara log prefix
-
-_access_logger = logging.getLogger("akara.access")
-_access_logger.setLevel(logging.DEBUG)
-_access_log_formatter = logging.Formatter("%(message)s")
-
-_access_handler = None
-
-def set_access_logfile(f):
-    global _access_handler
-    new_access_handler = logging.FileHandler(f)
-    new_access_handler.setFormatter(_access_log_formatter)
-    _access_logger.addHandler(new_access_handler)
-    if _access_handler is not None:
-        _access_logger.removeHandler(_access_handler)
-    _access_handler = new_access_handler
