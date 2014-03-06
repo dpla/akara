@@ -181,17 +181,6 @@ Does that directory exist and is it writeable?
 You may want to use 'akara setup' to set up the directory structure.""" % err)
             sys.exit(1)
 
-        # Configure the access log
-        try:
-            logger_config.set_access_logfile(settings["access_log"])
-        except IOError, err:
-            logger.fatal("""\
-Could not open the Akara access log:
-   %s
-Does that directory exist and is it writeable?""" % err)
-            sys.exit(1)
-
-
         # Don't start if the PID file already exists.
         pid_file = settings["pid_file"]
 
@@ -247,6 +236,7 @@ Does that directory exist and is it writeable?""" % err)
             # within a few check intervals (each about 1 second), so it
             # didn't have much long-term effect.
             logger.info("Akara server is running")
+            access_logger = logger_config.AccessLogger(settings["access_log"])
             server = AkaraPreforkServer(
                 minSpare = settings["min_spare_servers"],
                 maxSpare = settings["max_spare_servers"],
@@ -254,6 +244,7 @@ Does that directory exist and is it writeable?""" % err)
                 maxRequests = settings["max_requests_per_server"],
                 settings = settings,
                 config = config,
+                access_logger = access_logger
                 )
 
             # Everything is ready to go, except for saving the PID file

@@ -51,7 +51,7 @@ from akara import registry
 
 from akara.thirdparty import preforkserver, httpserver
 
-access_logger = logging.getLogger("akara.access")
+_access_logger = None
 
 # AkaraPreforkServer creates and manages the subprocesses which are
 # listening for HTTP requests. When a new connection request comes in
@@ -84,15 +84,17 @@ access_logger = logging.getLogger("akara.access")
 # child mainloop run.
 
 class AkaraPreforkServer(preforkserver.PreforkServer):
-    def __init__(self, settings, config,
+    def __init__(self, settings, config, access_logger,
                  minSpare=1, maxSpare=5, maxChildren=50,
                  maxRequests=0):
+        global _access_logger
+        _access_logger = access_logger
+        self.config = config
         preforkserver.PreforkServer.__init__(self,
                                              minSpare=minSpare, maxSpare=maxSpare,
                                              maxChildren=maxChildren, maxRequests=maxRequests,
                                              jobClass=AkaraJob,
                                              jobArgs=(settings, config))
-        self.config = config
     def _child(self, sock, parent):
         _init_modules(self.config)
         preforkserver.PreforkServer._child(self, sock, parent)
@@ -173,7 +175,9 @@ def _send_error(start_response, code, exc_info=None):
 ACCESS_LOG_MESSAGE = (
     '%(REMOTE_ADDR)s - %(REMOTE_USER)s [%(start_time)s] '
     '"%(REQUEST_METHOD)s %(REQUEST_URI)s %(HTTP_VERSION)s" '
-    '%(status)s %(bytes)s "%(HTTP_REFERER)s" "%(HTTP_USER_AGENT)s"')
+    '%(status)s %(bytes)s "%(HTTP_REFERER)s" "%(HTTP_USER_AGENT)s" '
+    '%(elapsed_us)s'
+    )
 
 # This proved a lot more difficult than I thought it would be.
 # I looked at the translogger solution, but I don't think it works
@@ -290,6 +294,7 @@ class AkaraWSGIDispatcher(object):
 
         # Call the handler, deal with any errors, do access logging
         try:
+            timing_start_time = time.time()
             try:
                 service = registry.get_service(mount_point)
             except KeyError:
@@ -312,11 +317,13 @@ class AkaraWSGIDispatcher(object):
                 finally:
                     del exc_info
         finally:
+            timing_end_time = time.time()
+            access_data["elapsed_us"] = int((timing_end_time - timing_start_time) * 1000000)
             self.save_to_access_log(environ, access_data)
 
 
-            
     def save_to_access_log(self, environ, access_data):
+        global _access_logger
         fields = dict(REMOTE_ADDR = _clean(environ.get("REMOTE_ADDR")),
                       REMOTE_USER = _clean(environ.get("REMOTE_USER")),
                       start_time = access_data["start_time"],
@@ -327,8 +334,9 @@ class AkaraWSGIDispatcher(object):
                       bytes = access_data["content_length"],
                       HTTP_REFERER = _clean(environ.get("HTTP_REFERER")),
                       HTTP_USER_AGENT = _clean(environ.get("HTTP_USER_AGENT")),
+                      elapsed_us = access_data["elapsed_us"]
                       )
-        access_logger.debug(ACCESS_LOG_MESSAGE % fields)
+        _access_logger.write(ACCESS_LOG_MESSAGE % fields)
 
 
 ###### Support extension modules
@@ -358,3 +366,4 @@ def _init_modules(config):
 "Unable to initialize module %r - skipping rest of module" % (module_name,),
                          exc_info = True)
     
+
