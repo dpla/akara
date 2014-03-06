@@ -51,7 +51,7 @@ from akara import registry
 
 from akara.thirdparty import preforkserver, httpserver
 
-access_logger = logging.getLogger("akara.access")
+_access_logger = None
 
 # AkaraPreforkServer creates and manages the subprocesses which are
 # listening for HTTP requests. When a new connection request comes in
@@ -84,15 +84,17 @@ access_logger = logging.getLogger("akara.access")
 # child mainloop run.
 
 class AkaraPreforkServer(preforkserver.PreforkServer):
-    def __init__(self, settings, config,
+    def __init__(self, settings, config, access_logger,
                  minSpare=1, maxSpare=5, maxChildren=50,
                  maxRequests=0):
+        global _access_logger
+        _access_logger = access_logger
+        self.config = config
         preforkserver.PreforkServer.__init__(self,
                                              minSpare=minSpare, maxSpare=maxSpare,
                                              maxChildren=maxChildren, maxRequests=maxRequests,
                                              jobClass=AkaraJob,
                                              jobArgs=(settings, config))
-        self.config = config
     def _child(self, sock, parent):
         _init_modules(self.config)
         preforkserver.PreforkServer._child(self, sock, parent)
@@ -315,8 +317,8 @@ class AkaraWSGIDispatcher(object):
             self.save_to_access_log(environ, access_data)
 
 
-            
     def save_to_access_log(self, environ, access_data):
+        global _access_logger
         fields = dict(REMOTE_ADDR = _clean(environ.get("REMOTE_ADDR")),
                       REMOTE_USER = _clean(environ.get("REMOTE_USER")),
                       start_time = access_data["start_time"],
@@ -328,7 +330,7 @@ class AkaraWSGIDispatcher(object):
                       HTTP_REFERER = _clean(environ.get("HTTP_REFERER")),
                       HTTP_USER_AGENT = _clean(environ.get("HTTP_USER_AGENT")),
                       )
-        access_logger.debug(ACCESS_LOG_MESSAGE % fields)
+        _access_logger.write(ACCESS_LOG_MESSAGE % fields)
 
 
 ###### Support extension modules
